@@ -320,7 +320,7 @@
     <span class="dot"></span>
     <span>disponible</span>
     <span class="sep">·</span>
-    <span class="loc">Tlaxcala, MX</span>
+    <span class="loc" id="visitorLoc">México</span>
   </div>
 
   <div class="btn-wrap">
@@ -359,6 +359,21 @@
     void contactBtn.offsetWidth; // reinicia la animación si se hace clic varias veces seguidas
     contactBtn.classList.add('clicked');
   });
+
+  // Detecta la ciudad/país del visitante por su IP y lo muestra en vez de un texto fijo
+  fetch('https://ipapi.co/json/')
+    .then(res => res.json())
+    .then(data => {
+      const locEl = document.getElementById('visitorLoc');
+      if (data && data.city && data.country_code) {
+        locEl.textContent = data.city + ', ' + data.country_code;
+      } else if (data && data.country_name) {
+        locEl.textContent = data.country_name;
+      }
+    })
+    .catch(() => {
+      // Si el servicio falla o el visitante bloquea la petición, se queda "México" como respaldo
+    });
 </script>
 
 </body>
