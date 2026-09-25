@@ -64,6 +64,7 @@
     border: 2px solid rgba(255,255,255,.85);
     text-decoration: none; color: #fff;
     box-shadow: 0 10px 30px rgba(120,90,200,.25);
+    cursor: pointer;
   }
   .hero::after {
     content: ''; position: absolute; inset: 0;
@@ -84,6 +85,7 @@
     color: var(--text); text-decoration: none; text-align: left;
     -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     transition: transform .15s ease, background .15s ease;
+    cursor: pointer;
   }
   .link:hover { background: rgba(255,255,255,.95); transform: translateY(-1px); }
   .link:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
@@ -139,6 +141,44 @@
   main { position: relative; z-index: 1; }
 
   @media (prefers-reduced-motion: reduce) { .link { transition: none; } .hearts { display: none; } .hero-wrap::before, .hero-wrap::after { animation: none; } }
+
+  /* Verificación de edad */
+  .age-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(20,14,40,.72);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    z-index: 999;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .age-overlay.active { display: flex; }
+  .age-box {
+    background: #fff;
+    border-radius: 22px;
+    padding: 30px 24px;
+    max-width: 340px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(60,40,110,.35);
+  }
+  .age-box .lock-icon {
+    width: 48px; height: 48px; margin: 0 auto 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center;
+  }
+  .age-box .lock-icon svg { width: 22px; height: 22px; fill: #fff; }
+  .age-box h3 { font-size: 1.1rem; margin-bottom: 8px; }
+  .age-box p { font-size: .85rem; color: var(--muted); margin-bottom: 20px; line-height: 1.4; }
+  .age-buttons { display: flex; gap: 10px; }
+  .age-buttons button {
+    flex: 1; padding: 12px; border-radius: 14px; border: none;
+    font-family: inherit; font-weight: 600; font-size: .9rem; cursor: pointer;
+  }
+  .btn-back { background: #f1eefc; color: var(--text); }
+  .btn-continue {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff;
+  }
 </style>
 </head>
 <body>
@@ -154,19 +194,18 @@
 
   <!-- Foto principal: foto-principal.jpeg -->
   <div class="hero-wrap">
-    <a class="hero" href="https://onlyfans.com/sandrabrezeofficial/c11" target="_blank" rel="noopener" aria-label="Dónde más publico">
+    <div class="hero" role="button" tabindex="0" aria-label="Contenido exclusivo" onclick="openAgeGate()" onkeypress="if(event.key==='Enter')openAgeGate()">
       <span>✨SEE MORE OF ME✨</span>
-    </a>
+    </div>
   </div>
 
   <nav class="links" aria-label="Mis links">
-    <!-- Falta poner el link en "Más links" (href="#") -->
-    <a class="link main" href="https://onlyfans.com/sandrabrezeofficial/c11" target="_blank" rel="noopener">
+    <div class="link main" role="button" tabindex="0" onclick="openAgeGate()" onkeypress="if(event.key==='Enter')openAgeGate()">
       <span class="badge" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 2.6 5 6 5c2 0 3.3 1 4 2.2h4C14.7 6 16 5 18 5c3.4 0 5.1 3.4 3.6 6.8C19.5 16.4 12 21 12 21z"/></svg>
       </span>
       <span><strong>💙MY EXCLUSIVE CONTENT</strong><small></small></span>
-    </a>
+    </div>
 
     <a class="link" href="https://www.instagram.com/real.sandrabreeze/" target="_blank" rel="noopener">
       <span class="badge" aria-hidden="true">
@@ -193,27 +232,56 @@
   <footer>© 2026 Sandra Breeze</footer>
 </main>
 
+<!-- Verificación de edad -->
+<div class="age-overlay" id="ageGate">
+  <div class="age-box">
+    <div class="lock-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 0 1 6 0v3z"/></svg>
+    </div>
+    <h3>Aviso de contenido</h3>
+    <p>Este enlace tiene acceso restringido. Al continuar, confirmas que eres mayor de edad en tu país.</p>
+    <div class="age-buttons">
+      <button class="btn-back" onclick="closeAgeGate()">Volver</button>
+      <button class="btn-continue" onclick="goToContent()">Continuar</button>
+    </div>
+  </div>
+</div>
+
 <script>
-(function () {
-  var box = document.getElementById('hearts');
-  if (!box || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var colors = ['#f08fbb', '#f7b3d0', '#c9b8f5', '#ffffff', '#ff7fae'];
-  var svg = function (c) {
-    return '<svg viewBox="0 0 24 24" width="100%" height="100%"><path fill="' + c +
-      '" d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 2.6 5 6 5c2 0 3.3 1 4 2.2h4C14.7 6 16 5 18 5c3.4 0 5.1 3.4 3.6 6.8C19.5 16.4 12 21 12 21z"/></svg>';
-  };
-  for (var i = 0; i < 16; i++) {
-    var h = document.createElement('span');
-    var size = 14 + Math.random() * 26;
-    h.className = 'heart';
-    h.style.width = h.style.height = size + 'px';
-    h.style.left = (Math.random() * 96) + '%';
-    h.style.animationDuration = (9 + Math.random() * 9) + 's';
-    h.style.animationDelay = (-Math.random() * 14) + 's';
-    h.innerHTML = svg(colors[Math.floor(Math.random() * colors.length)]);
-    box.appendChild(h);
+  // Reemplaza este link por el que quieras usar detrás del muro de edad
+  var EXCLUSIVE_LINK = "https://onlyfans.com/sandrabrezeofficial/c11";
+
+  function openAgeGate() {
+    document.getElementById('ageGate').classList.add('active');
   }
-})();
+  function closeAgeGate() {
+    document.getElementById('ageGate').classList.remove('active');
+  }
+  function goToContent() {
+    window.open(EXCLUSIVE_LINK, '_blank', 'noopener');
+    closeAgeGate();
+  }
+
+  (function () {
+    var box = document.getElementById('hearts');
+    if (!box || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var colors = ['#f08fbb', '#f7b3d0', '#c9b8f5', '#ffffff', '#ff7fae'];
+    var svg = function (c) {
+      return '<svg viewBox="0 0 24 24" width="100%" height="100%"><path fill="' + c +
+        '" d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 2.6 5 6 5c2 0 3.3 1 4 2.2h4C14.7 6 16 5 18 5c3.4 0 5.1 3.4 3.6 6.8C19.5 16.4 12 21 12 21z"/></svg>';
+    };
+    for (var i = 0; i < 16; i++) {
+      var h = document.createElement('span');
+      var size = 14 + Math.random() * 26;
+      h.className = 'heart';
+      h.style.width = h.style.height = size + 'px';
+      h.style.left = (Math.random() * 96) + '%';
+      h.style.animationDuration = (9 + Math.random() * 9) + 's';
+      h.style.animationDelay = (-Math.random() * 14) + 's';
+      h.innerHTML = svg(colors[Math.floor(Math.random() * colors.length)]);
+      box.appendChild(h);
+    }
+  })();
 </script>
 </body>
 </html>
